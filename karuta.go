@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/mattn/go-lingr"
 	"github.com/hoisie/web"
 	"log"
 	"os"
@@ -13,23 +14,7 @@ import (
 )
 
 type Status struct {
-	Events []Event `json:"events"`
-}
-
-type Event struct {
-	Id      int      `json:"event_id"`
-	Message *Message `json:"message"`
-}
-
-type Message struct {
-	Id              string `json:"id"`
-	Room            string `json:"room"`
-	PublicSessionId string `json:"public_session_id"`
-	IconUrl         string `json:"icon_url"`
-	Type            string `json:"type"`
-	SpeakerId       string `json:"speaker_id"`
-	Nickname        string `json:"nickname"`
-	Text            string `json:"text"`
+	Events  []lingr.Event `json:"events"`
 }
 
 type Karuta struct {
@@ -49,7 +34,7 @@ var addr = flag.String("addr", defaultAddr(), "server address")
 
 var reCheck = regexp.MustCompile(`^[あ-ん]$`)
 var reUpdate = regexp.MustCompile(`^!vim-karuta\s+(\S+)\s+(.+)$`)
-var reQuery = regexp.MustCompile(`^?vim-karuta\s+(\S+)$`)
+var reQuery = regexp.MustCompile(`^\?vim-karuta\s+(\S+)$`)
 
 func main() {
 	flag.Parse()

@@ -32,6 +32,11 @@ type Message struct {
 	Text            string `json:"text"`
 }
 
+type Karuta struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 func defaultAddr() string {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -71,6 +76,22 @@ func main() {
 		}
 		rows.Close()
 		return ret
+	})
+	web.Get("/json", func(ctx *web.Context) {
+		ctx.SetHeader("Content-Type", "application/json; charset=utf-8", true)
+		rows, err := db.Query("select key, value from karuta order by key")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		ret := make([]Karuta, 0)
+		for rows.Next() {
+			var key, value string
+			rows.Scan(&key, &value)
+			ret = append(ret, Karuta{key, value})
+		}
+		rows.Close()
+		json.NewEncoder(ctx).Encode(ret)
 	})
 	web.Post("/lingr", func(ctx *web.Context) string {
 		var status Status

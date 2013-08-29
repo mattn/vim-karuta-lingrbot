@@ -80,11 +80,28 @@ func main() {
 				if !reCheck.MatchString(tokens[1]) {
 					ret += "お前いい加減にしろよ\n"
 				} else {
-					_, err = db.Exec("insert into karuta(key, value) values (?, ?)", tokens[1], tokens[2])
+					rows, err := db.Query("select key, value from karuta where key = ?", tokens[1])
 					if err != nil {
 						log.Println(err)
 					} else {
-						ret += "登録しました\n"
+						exists := rows.Next()
+						rows.Close()
+						if exists {
+							_, err = db.Exec("update karuta set value = ? where key = ?", tokens[2], tokens[1])
+							if err != nil {
+								log.Println(err)
+							} else {
+								ret += "更新しました\n"
+							}
+						} else {
+							_, err = db.Exec("insert into karuta(key, value) values (?, ?)", tokens[1], tokens[2])
+							if err != nil {
+								log.Println(err)
+							} else {
+								ret += "登録しました\n"
+							}
+						}
+						rows.Close()
 					}
 				}
 			}

@@ -56,15 +56,31 @@ func main() {
 		log.Println(err)
 	}
 
-	web.Get("/", func() string {
-		return ""
+	web.Get("/", func(ctx *web.Context) string {
+		ctx.SetHeader("Content-Type", "text/plain; charset=utf-8", true)
+		rows, err := db.Query("select key, value from karuta order by key")
+		if err != nil {
+			log.Println(err)
+			return ""
+		}
+		ret := ""
+		for rows.Next() {
+			var key, value string
+			rows.Scan(&key, &value)
+			ret += key + ": " + value + "\n"
+		}
+		rows.Close()
+		return ret
 	})
 	web.Post("/lingr", func(ctx *web.Context) string {
 		var status Status
 		err := json.NewDecoder(ctx.Request.Body).Decode(&status)
+		if err != nil {
+			return ""
+		}
 		ret := ""
-		if err == nil && len(status.Events) > 0 {
-			text := status.Events[0].Message.Text
+		for _, event := range status.Events {
+			text := event.Message.Text
 			tokens := reUpdate.FindStringSubmatch(text)
 			if len(tokens) == 3 {
 				if !reCheck.MatchString(tokens[1]) {

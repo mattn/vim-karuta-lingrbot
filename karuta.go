@@ -84,11 +84,11 @@ func main() {
 			log.Println(err)
 			return
 		}
-		ret := make([]Karuta, 0)
+		ret := make(map[string]string)
 		for rows.Next() {
 			var key, value string
 			rows.Scan(&key, &value)
-			ret = append(ret, Karuta{key, value})
+			ret[key] = value
 		}
 		rows.Close()
 		json.NewEncoder(ctx).Encode(ret)

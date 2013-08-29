@@ -49,16 +49,6 @@ var reQuery = regexp.MustCompile(`^?vim-karuta\s+(\S+)$`)
 func main() {
 	flag.Parse()
 
-	/*
-	cs, err := pq.ParseURL(os.Getenv("HEROKU_POSTGRESQL_GREEN_URL"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	db, err := sql.Open("postgres", cs)
-	if err != nil {
-		log.Fatal(err)
-	}
-	*/
 	db, err := sql.Open("sqlite3", "karuta.db")
 
 	_, err = db.Exec("create table karuta (key varchar not null primary key, value varchar not null);")
